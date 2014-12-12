@@ -1,14 +1,14 @@
 <?php
 /**
  * @package rss-per-page
- * @version 1.0
+ * @version 1.1
  */
 /*
 Plugin Name: rss-per-page
 Plugin URI: http://www.funsite.eu/plugins/rss-per-page
 Description: Adds a field to pages and implements a widget to show a RSS depending on that field. 
 Author: Gerhard Hoogterp
-Version: 1.0
+Version: 1.1
 Author URI: http://www.funsite.eu/
 */
 
@@ -191,7 +191,7 @@ function rss_per_page_headercode () {
 
 
 function create_rss_id_box() {
-	add_meta_box( 'my-meta-box', 'RSS ID', 'RSS_ID_box', 'page', 'normal', 'high' );
+	add_meta_box( 'my-meta-box', 'RSS ID', 'RSS_ID_box', 'page', 'side', 'default' );
 }
 
 function rss_id_box( $object, $box ) { ?>
@@ -223,6 +223,16 @@ function save_rss_id( $post_id, $post ) {
 		delete_post_meta( $post_id, 'rss_id', $meta_value );
 }
 
+/* -------------------------------------------------------------------------------------- */
+function rss_per_page_PluginLinks($links, $file) {
+		$base = plugin_basename(__FILE__);
+		if ($file == $base) {
+			$links[] = '<a href="https://wordpress.org/support/view/plugin-reviews/rss-per-page">' . __('A review would be appriciated.','wp_widget_plugin') . '</a>';
+		}
+		return $links;
+	}
+
+add_filter('plugin_row_meta', 'rss_per_page_PluginLinks',10,2);
 
 // admin interface
 add_action( 'admin_menu', 'create_rss_id_box' );
