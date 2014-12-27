@@ -4,7 +4,7 @@ Donate link: http://www.funsite.eu/rss-per-page/
 Tags: widget,rss, per page, plugin
 Requires at least: 3.0.1
 Tested up to: 4.1
-Stable tag: 1.1
+Stable tag: 1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,10 @@ I wanted to show the reviews together with the plugin info.
 == Changelog ==
 
 Release early, release often.. Please if you find issues with this plugin, let me know.. 
+
+= 1.2 =
+- Made the plugin translatable and added dutch languagesupport
+- Rewrote the plugin partly to clean up the code and avoid clashes with my other plugins.
 
 = 1.1 =
 Nothing much. Moved the ID field block to the side where it takes less space.
