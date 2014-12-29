@@ -1,20 +1,20 @@
 <?php
 /**
  * @package rss-per-page
- * @version 1.2
+ * @version 1.3
  */
 /*
 Plugin Name: rss-per-page
 Plugin URI: http://www.funsite.eu/plugins/rss-per-page
 Description: Adds a field to pages and implements a widget to show a RSS depending on that field. 
 Author: Gerhard Hoogterp
-Version: 1.2
+Version: 1.3
 Author URI: http://www.funsite.eu/
 */
 
 class rss_per_page_widget extends WP_Widget {
 
-	const FS_TEXTDOMAIN = FS_rss_per_page::FS_TEXTDOMAIN;
+	const FS_TEXTDOMAIN = rss_per_page_class::FS_TEXTDOMAIN; // as this widget is initizalized from the FS_rss_per_page class
 
 	// constructor
 	function rss_per_page_widget() {
@@ -66,41 +66,41 @@ class rss_per_page_widget extends WP_Widget {
 	function form($instance) {
 	    // Check values
 	    if( $instance) {
-		$title = esc_attr($instance['title']);
-		$rssfeed = esc_attr($instance['rssfeed']);
-		$defaultRSS = esc_textarea($instance['defaultRSS']);
-		$defaultTitle = esc_textarea($instance['defaultTitle']);
-		$maxShow = esc_textarea($instance['maxShow']);
+			$title = esc_attr($instance['title']);
+			$rssfeed = esc_attr($instance['rssfeed']);
+			$defaultRSS = esc_textarea($instance['defaultRSS']);
+			$defaultTitle = esc_textarea($instance['defaultTitle']);
+			$maxShow = esc_textarea($instance['maxShow']);
 	    } else {
-		$title = __('Plugin reviews for @ID@',self::FS_TEXTDOMAIN);
-		$rssfeed = 'https://wordpress.org/support/rss/view/plugin-reviews/@ID@';
-		$defaultRSS = 'https://wordpress.org/news/feed/';
-		$defaultTitle = 'Wordpress news';
-		$maxShow = 3;
+			$title = __('Plugin reviews for @ID@',self::FS_TEXTDOMAIN);
+			$rssfeed = 'https://wordpress.org/support/rss/view/plugin-reviews/@ID@';
+			$defaultRSS = 'https://wordpress.org/news/feed/';
+			$defaultTitle = 'Wordpress news';
+			$maxShow = 3;
 	    }
 	    ?>
 
 	    <p>
-	    <label for="<?php echo $this->get_field_id('title'); ?>"><?php __('Widget Title', self::FS_TEXTDOMAIN); ?></label>
+	    <label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Widget Title', self::FS_TEXTDOMAIN); ?></label>
 	    <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>" />
 	    </p>
 	    <p>
-	    <label for="<?php echo $this->get_field_id('rssfeed'); ?>"><?php __('RSS feed (add <b>@ID@</b> where the RSS ID has to be inserted)', self::FS_TEXTDOMAIN); ?></label>
+	    <label for="<?php echo $this->get_field_id('rssfeed'); ?>"><?php _e('RSS feed (add <b>@ID@</b> where the RSS ID has to be inserted)', self::FS_TEXTDOMAIN); ?></label>
 	    <input class="widefat" id="<?php echo $this->get_field_id('rssfeed'); ?>" name="<?php echo $this->get_field_name('rssfeed'); ?>" type="text" value="<?php echo $rssfeed; ?>" />
 	    </p>
 	    
    	    <p>
-	    <label for="<?php echo $this->get_field_id('defaultRSS'); ?>"><?php __('Default RSS feed (use when the page RSS ID is empty)', self::FS_TEXTDOMAIN); ?></label>
+	    <label for="<?php echo $this->get_field_id('defaultRSS'); ?>"><?php _e('Default RSS feed (use when the page RSS ID is empty)', self::FS_TEXTDOMAIN); ?></label>
 	    <input class="widefat" id="<?php echo $this->get_field_id('defaultRSS'); ?>" name="<?php echo $this->get_field_name('defaultRSS'); ?>" type="text" value="<?php echo $defaultRSS; ?>" />
 	    </p>
 	    
    	    <p>
-	    <label for="<?php echo $this->get_field_id('defaultTitle'); ?>"><?php __('Default RSS title (used with the default RSS feed)', self::FS_TEXTDOMAIN); ?></label>
+	    <label for="<?php echo $this->get_field_id('defaultTitle'); ?>"><?php _e('Default RSS title (used with the default RSS feed)', self::FS_TEXTDOMAIN); ?></label>
 	    <input class="widefat" id="<?php echo $this->get_field_id('defaultTitle'); ?>" name="<?php echo $this->get_field_name('defaultTitle'); ?>" type="text" value="<?php echo $defaultTitle; ?>" />
 	    </p>
 
 	    <p>
-	    <label for="<?php echo $this->get_field_id('maxShow'); ?>"><?php __('Show items', self::FS_TEXTDOMAIN); ?></label>
+	    <label for="<?php echo $this->get_field_id('maxShow'); ?>"><?php _e('Show items', self::FS_TEXTDOMAIN); ?></label>
 	    <input class="widefat" id="<?php echo $this->get_field_id('maxShow'); ?>" name="<?php echo $this->get_field_name('maxShow'); ?>" type="text" value="<?php echo $maxShow; ?>" />
 	    </p>
 	    
@@ -187,10 +187,11 @@ class rss_per_page_widget extends WP_Widget {
 }
 
 
-class FS_rss_per_page {
+class rss_per_page_class {
 
 	const FS_TEXTDOMAIN = 'rssperpage';	
-
+	const FS_PLUGINNAME = 'rss-per-page';
+	
     public function __construct() {
 
 		add_action('init', array($this,'myTextDomain'));
@@ -256,7 +257,7 @@ class FS_rss_per_page {
 	function rss_per_page_PluginLinks($links, $file) {
 			$base = plugin_basename(__FILE__);
 			if ($file == $base) {
-				$links[] = '<a href="https://wordpress.org/support/view/plugin-reviews/rss-per-page">' . __('A review would be appriciated.',self::FS_TEXTDOMAIN) . '</a>';
+				$links[] = '<a href="https://wordpress.org/support/view/plugin-reviews/'.self::FS_PLUGINNAME.'#postform">' . __('Please rate me.',self::FS_TEXTDOMAIN) . '</a>';
 			}
 			return $links;
 		}
@@ -264,7 +265,7 @@ class FS_rss_per_page {
     
 }
  
-$rss__per_page = new FS_rss_per_page;
+$rss__per_page = new rss_per_page_class();
 
 
 
