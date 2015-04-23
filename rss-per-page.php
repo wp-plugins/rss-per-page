@@ -221,12 +221,12 @@ class rss_per_page_class {
 
 
 	function create_rss_id_box() {
-		add_meta_box( 'my-meta-box', __('RSS ID',self::FS_TEXTDOMAIN), array($this,'RSS_ID_box'), 'page', 'side', 'default' );
+		add_meta_box( 'my-meta-box', __('RSS ID',self::FS_TEXTDOMAIN), array($this,'rss_id_box'), 'page', 'side', 'default' );
 	}
 
 	function rss_id_box( $object, $box ) { ?>
 		<p>
-			<label for="RSSID"><?php __("Give the ID to fill in for the @ID@ placeholder in the rss-per-page widget",self::FS_TEXTDOMAIN); ?></label><br>
+			<label for="RSSID"><?php _e("Give the ID to replace the @ID@ placeholder in the widget for this page",self::FS_TEXTDOMAIN); ?></label><br>
 			<input name="rss_id" id="RSSID" style="width: 97%;" value="<?php echo wp_specialchars( get_post_meta( $object->ID, 'rss_id', true ), 1 ); ?>">
 			<input type="hidden" name="my_meta_box_nonce" value="<?php echo wp_create_nonce( plugin_basename( __FILE__ ) ); ?>" />
 		</p>
