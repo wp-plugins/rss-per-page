@@ -1,16 +1,20 @@
 <?php
 /**
  * @package rss-per-page
- * @version 1.3
+ * @version 1.4
  */
 /*
 Plugin Name: rss-per-page
 Plugin URI: http://www.funsite.eu/plugins/rss-per-page
 Description: Adds a field to pages and implements a widget to show a RSS depending on that field. 
 Author: Gerhard Hoogterp
-Version: 1.3
+Version: 1.4
 Author URI: http://www.funsite.eu/
 */
+
+if (!class_exists('basic_plugin_class')) {
+	require(plugin_dir_path(__FILE__).'basics/basic_plugin.class');
+}
 
 class rss_per_page_widget extends WP_Widget {
 
@@ -19,48 +23,15 @@ class rss_per_page_widget extends WP_Widget {
 	// constructor
 	function rss_per_page_widget() {
 		parent::WP_Widget(false, 
-							$name = __('rss per page widget', self::FS_TEXTDOMAIN),
-							array('description' => __('Show an rss feed build from an url and a page settable id.',self::FS_TEXTDOMAIN))
-						);
+			$name = __('rss per page widget', self::FS_TEXTDOMAIN),
+			array('description' => __('Show an rss feed build from an url and a page settable id.',self::FS_TEXTDOMAIN))
+                );
 	}
 
-	function pubDate2timestamp($pubDate) {
 
-		$day = substr($pubDate, 5, 2);
-		$month = substr($pubDate, 8, 3);
-		$month = date('m', strtotime("$month 1 2011"));
-		$year = substr($pubDate, 12, 4);
-		$hour = substr($pubDate, 17, 2);
-		$min = substr($pubDate, 20, 2);
-		$second = substr($pubDate, 23, 2);
-		$timezone = substr($pubDate, 26);
-
-		if (is_numeric($timezone)):
-			$convert['GMT']=($timezone/100)*3600;
-			$timezone='GMT';
-		else:
-			$convert['GMT'] = +3600;
-			$convert['GMT'] += (date('I',mktime(12,0,0,$month,$day,$year)))?3600:0;   // extra hour for summertime;
-		endif;	
-		//print $timezone.'  '.$convert['GMT'].' ';
-
-		$timestamp = mktime($hour, $min, $second, $month, $day, $year);
-	//	date_default_timezone_set('Europe/Amsterdam');
-
-		if(is_numeric($timezone)) {
-			$modifier = substr($timezone, 0, 1);
-			$hours_mod = (int) substr($timezone, 1, 2);
-			$mins_mod = (int) substr($timezone, 3, 2);
-			$diff=(int)($modifier+($hours_mod*3600)+($mins_mod*60));
-			$timestamp=$timestamp+$diff;
-		} else {
-			$timestamp=$timestamp+$convert[$timezone];
-		}
-
-		return $timestamp;
-	}	
-	
-	
+        function cachetimeout( $seconds ) {
+            return 300;
+        }	
 	
 	// widget form creation
 	function form($instance) {
@@ -136,7 +107,10 @@ class rss_per_page_widget extends WP_Widget {
 		}
 		
 		// use feed title if local title is empty
-		$rss = simplexml_load_file($feed);		
+		add_filter( 'wp_feed_cache_transient_lifetime' , array($this,'cachetimeout'));
+                $rss = fetch_feed($feed);
+                remove_filter( 'wp_feed_cache_transient_lifetime' , array($this,'cachetimeout'));
+                
 		if ($rss) {
 			$title = apply_filters('widget_title', $instance['title']);
 			if ($rss_id) {
@@ -151,7 +125,9 @@ class rss_per_page_widget extends WP_Widget {
 		}
 		
 		$maxShow = apply_filters('widget_title', $instance['maxShow']);
-
+                $maxItems = $rss->get_item_quantity($maxShow);
+		$rss_items = $rss->get_items( 0, $maxItems );
+		
 		echo $before_widget;
 	  
 		// Display the widget
@@ -163,15 +139,12 @@ class rss_per_page_widget extends WP_Widget {
 		}
 			echo '<div class="entry">';
 			if ($rss) {
-				if (count($rss->channel->item)) {
-					$cnt=0;
-					foreach ($rss->channel->item as $item) {
-						echo '<div class="title"><a href="'. $item->link .'" rel="external">' . $item->title . "</a></div>";
-						$timestamp = $this->pubDate2timestamp($item->pubDate);
-						echo '<p><span class="date">' . strftime('%d %B %Y',$timestamp) . "</span><br>";
-						echo  strip_tags($item->description) . "</p>";
-						$cnt++;
-						if ($cnt>=$maxShow) break;
+				if ($maxItems) {
+					foreach ($rss_items as $item) {
+						echo '<div class="title"><a href="'.esc_url( $item->get_permalink() ) .'" rel="external">' . $item->get_title() . "</a></div>";
+					
+						echo '<p><span class="date">' . $item->get_date('G:i, j M Y') . "</span><br>";
+						echo  strip_tags($item->get_description()) . "</p>";
 					}
 				} else {
 					print '<span class="nonews">'.__('No news found', self::FS_TEXTDOMAIN).'</span>';
@@ -187,34 +160,31 @@ class rss_per_page_widget extends WP_Widget {
 }
 
 
-class rss_per_page_class {
+class rss_per_page_class extends basic_plugin_class {
 
-	const FS_TEXTDOMAIN = 'rssperpage';	
+	function getPluginBaseName() { return plugin_basename(__FILE__); }
+	function getChildClassName() { return get_class($this); }
+
+        public function __construct() {
+            parent::__construct();
+
+            add_filter('plugin_row_meta', array($this,'rss_per_page_PluginLinks'),10,2);
+
+            // admin interface
+            add_action( 'admin_menu', array($this,'create_rss_id_box' ));
+            add_action( 'save_post', array($this,'save_rss_id'), 10, 2 );
+
+            // register widget
+            add_action('widgets_init', create_function('', 'return register_widget("rss_per_page_widget");'));
+            add_action('wp_head', array($this,'rss_per_page_headercode'),false,false,true);    
+        }
+
+        function pluginInfoRight($info) {  }
+        
+    	const FS_TEXTDOMAIN = 'rss-per-page';	
 	const FS_PLUGINNAME = 'rss-per-page';
-	
-    public function __construct() {
-
-		add_action('init', array($this,'myTextDomain'));
-		add_filter('plugin_row_meta', array($this,'rss_per_page_PluginLinks'),10,2);
-
-		// admin interface
-		add_action( 'admin_menu', array($this,'create_rss_id_box' ));
-		add_action( 'save_post', array($this,'save_rss_id'), 10, 2 );
-
-		// register widget
-		add_action('widgets_init', create_function('', 'return register_widget("rss_per_page_widget");'));
-		add_action('wp_head', array($this,'rss_per_page_headercode'),false,false,true);    
-    }
-
-	function myTextDomain() {
-		load_plugin_textdomain(
-			self::FS_TEXTDOMAIN,
-			false,
-			dirname(plugin_basename(__FILE__)).'/languages/'
-		);
-	}
-  
     
+
 	function rss_per_page_headercode () {
 		wp_enqueue_style('rss_per_page_handler', plugins_url('/css/rss-per-page.css', __FILE__ ));
 	}		

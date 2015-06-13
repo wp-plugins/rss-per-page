@@ -4,7 +4,7 @@ Donate link: http://www.funsite.eu/rss-per-page/
 Tags: widget,rss, per page, plugin
 Requires at least: 3.0.1
 Tested up to: 4.2
-Stable tag: 1.3
+Stable tag: 1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,10 @@ I wanted to show the reviews together with the plugin info.
 3. the page rss id
 
 == Changelog ==
+= 1.4 =
+Found out that WP has build in support for fetching feeds which is a beter way to deal with rss.
+So the plugin has been converted. The cache timeout for a feed is 5 min. 
+Also upgraded the plugin to my basis framework and fixed a few bugs and anoyances. 
 
 = 1.3 =
 Fixed some minor bugs
