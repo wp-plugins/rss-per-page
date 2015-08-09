@@ -1,0 +1,15 @@
+.rss_per_page_hook .entry {
+	margin-bottom: 5px;
+	line-height: 1.4em;
+}
+
+.rss_per_page_hook .entry .title {
+	font-weight: bold;
+}
+.rss_per_page_hook .entry .date {
+	font-size: 0.8em;	
+}
+
+.rss_per_page_hook .entry .nonews {
+	color: #aaa;	
+}
