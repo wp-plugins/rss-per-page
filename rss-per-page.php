@@ -1,14 +1,14 @@
 <?php
 /**
  * @package rss-per-page
- * @version 1.4
+ * @version 1.5
  */
 /*
 Plugin Name: rss-per-page
 Plugin URI: http://www.funsite.eu/plugins/rss-per-page
 Description: Adds a field to pages and implements a widget to show a RSS depending on that field. 
 Author: Gerhard Hoogterp
-Version: 1.4
+Version: 1.5
 Author URI: http://www.funsite.eu/
 */
 
@@ -21,7 +21,7 @@ class rss_per_page_widget extends WP_Widget {
 	const FS_TEXTDOMAIN = rss_per_page_class::FS_TEXTDOMAIN; // as this widget is initizalized from the FS_rss_per_page class
 
 	// constructor
-	function rss_per_page_widget() {
+	public function __construct() {
 		parent::WP_Widget(false, 
 			$name = __('rss per page widget', self::FS_TEXTDOMAIN),
 			array('description' => __('Show an rss feed build from an url and a page settable id.',self::FS_TEXTDOMAIN))
