@@ -5,11 +5,11 @@
  */
 /*
 Plugin Name: rss-per-page
-Plugin URI: http://www.funsite.eu/plugins/rss-per-page
+Plugin URI: http://plugins.funsite.eu/rss-per-page/
 Description: Adds a field to pages and implements a widget to show a RSS depending on that field. 
 Author: Gerhard Hoogterp
 Version: 1.5
-Author URI: http://www.funsite.eu/
+Author URI: http://plugins.funsite.eu/rss-per-page/
 */
 
 if (!class_exists('basic_plugin_class')) {

@@ -1,6 +1,6 @@
 === Plugin Name ===
 Contributors: jondor
-Donate link: http://www.funsite.eu/rss-per-page/
+Donate link: http://plugins.funsite.eu/rss-per-page/
 Tags: widget,rss, per page, plugin
 Requires at least: 3.0.1
 Tested up to: 4.3
